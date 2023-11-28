@@ -15,11 +15,12 @@ function popup(feature,layer) {
 }
 
 //Agregar capa en json
-L.geoJson(agebs).addTo(map);
+L.geoJson(agebs);
 
 let agebsJS = L.geoJson(agebs,{
+  style: style,
     onEachFeature: popup
-}).addTo(map);
+});
 
 
 // Geocoder buscador en el mapa 
@@ -96,3 +97,55 @@ function ocultarMenu() {
 
 document.addEventListener("DOMContentLoaded", ocultarMenu);
 
+function getColor(d) {
+  return d > 1000
+    ? "#800026"
+    : d > 500
+    ? "#BD0026"
+    : d > 200
+    ? "#E31A1C"
+    : d > 100
+    ? "#FC4E2A"
+    : d > 50
+    ? "#FD8D3C"
+    : d > 20
+    ? "#FEB24C"
+    : d > 10
+    ? "#FED976"
+    : "#FFEDA0";
+}
+
+//CREAR LA FUNCION PARA MOSTRAR LA SIMBOLOGIA DE ACUERDO AL CAMPO POBTOT
+function style(feature) {
+  return {
+    fillColor: getColor(feature.properties.POBTOT),
+    weight: 2,
+    opacity: 1,
+    color: "white",
+    dashArray: "3",
+    fillOpacity: 0.7,
+  };
+}
+
+// Función para mostrar/ocultar la capa de población total según el estado del checkbox
+function togglePoblacionLayer() {
+  var poblacionCheckbox = document.getElementById("idPoblacionTot");
+
+  // Si el checkbox está marcado, añadir la capa al mapa
+  if (poblacionCheckbox.checked) {
+    agebsJS.addTo(map);
+  } else {
+    // Si el checkbox no está marcado, quitar la capa del mapa si ya está agregada
+    if (map.hasLayer(agebsJS)) {
+      map.removeLayer(agebsJS);
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  var poblacionCheckbox = document.getElementById("idPoblacionTot");
+  poblacionCheckbox.addEventListener("change", togglePoblacionLayer);
+
+  // Asegurarse de que la capa no esté añadida al mapa al inicio
+  togglePoblacionLayer();
+});
